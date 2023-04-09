@@ -3,6 +3,7 @@
 
 #include <WinUtils.hpp>
 #include <WinEventHandler.hpp>
+#include <DialogGetKeyCode.hpp>
 
 #include <QStandardPaths>
 #include <QFileInfo>
@@ -35,6 +36,14 @@ MainWindow::MainWindow(QWidget *parent)
 
 //    win::sendKeyboardEvent(90,true);
 //    win::sendKeyboardEvent(90,false);
+    auto key{win::DialogGetKeyCode::GetSimpleKey(this)};
+    if(key == win::DialogGetKeyCode::KeyVal::kCancelled){
+        qDebug() << "Cancelled";
+    } else if(key == win::DialogGetKeyCode::KeyVal::kUnbind){
+        qDebug() << "Unbind";
+    } else{
+        qDebug() << "Register key:" << key << " :" << win::virtualKeyCodeToString(static_cast<uint32_t>(key));
+    }
 }
 
 MainWindow::~MainWindow()

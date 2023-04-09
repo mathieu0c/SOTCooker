@@ -9,16 +9,21 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 add_library("${target_name}")
 add_library(${target_name}::${target_name} ALIAS "${target_name}")
 
+set(ADDITIONAL_SOURCES
+    DialogGetKeyCode.ui
+)
+
 target_sources("${target_name}"
     PRIVATE 
+        "${ADDITIONAL_SOURCES}"
         "${src_files}"
         "${hdr_files}"
         "${proto_files}"
-
 )
 target_link_libraries("${target_name}"
     PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Widgets
 )
 
 target_include_directories(${target_name}

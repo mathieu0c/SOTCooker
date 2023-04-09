@@ -1,3 +1,7 @@
+/*!
+ * Some code comes from the AntiMicroX project
+*/
+
 #include "WinUtils.hpp"
 
 #include <windows.h>
@@ -389,6 +393,34 @@ unsigned int scancodeFromVirtualKey(unsigned int virtualkey, unsigned int alias)
         }
 
         return scancode;
+}
+
+unsigned int correctVirtualKey(unsigned int scancode, unsigned int virtualkey)
+{
+    int mapvirtual = MapVirtualKey(scancode, MAPVK_VSC_TO_VK_EX);
+    int extended = (scancode & EXTENDED_FLAG) != 0;
+
+    int finalvirtual = 0;
+    switch (virtualkey)
+    {
+    case VK_CONTROL:
+        finalvirtual = extended ? VK_RCONTROL : VK_LCONTROL;
+        break;
+    case VK_SHIFT:
+        finalvirtual = mapvirtual;
+        break;
+    case VK_MENU:
+        finalvirtual = extended ? VK_RMENU : VK_LMENU;
+        break;
+    case 0x5E:
+        // Ignore System Reserved VK
+        finalvirtual = 0;
+        break;
+    default:
+        finalvirtual = virtualkey;
+    }
+
+    return finalvirtual;
 }
 
 } // namespace win

@@ -1,3 +1,7 @@
+/*!
+ * Some code comes from the AntiMicroX project
+*/
+
 #pragma once
 
 #include <QString>
@@ -49,6 +53,8 @@ void sendKeyboardEvent(int code, bool pressed,int codeAlias = 0);
 QString virtualKeyCodeToString(UCHAR virtualKey); //not tested in this context
 
 unsigned int scancodeFromVirtualKey(unsigned int virtualkey, unsigned int alias = 0);
+
+unsigned int correctVirtualKey(unsigned int scancode, unsigned int virtualkey);
 
 } // namespace win
 
