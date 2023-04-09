@@ -2,6 +2,16 @@ syntax = "proto3";
 
 package sot;
 
+enum CookingType{
+    option allow_alias = true;
+    kNone       = 0;
+    kFish       = 45;
+    kTrophyFish = 90;
+    kMeat       = 60;
+    kKraken     = 60;
+    kMegalodon  = 90;
+}
+
 message KeyboardProfile{//keyboard keys used to execute actions
     string profile_name      = 1;
 

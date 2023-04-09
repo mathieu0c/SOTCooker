@@ -6,6 +6,7 @@
 #include <QPushButton>
 
 #include <SOTCooker.pb.h>
+#include <SOTCooker.hpp>
 #include <CookerProto.hpp>
 #include <functional>
 #include <unordered_map>
@@ -72,5 +73,7 @@ private:
 
     sot::KeyboardProfile m_config{};
     std::unordered_map<QPushButton*,KeyboardProfileMutators<int>> m_pb_links{};
+
+    sot::Cooker m_cooker{this};
 };
 #endif // MAINWINDOW_HPP

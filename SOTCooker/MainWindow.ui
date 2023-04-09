@@ -23,7 +23,7 @@
     <item>
      <widget class="QTabWidget" name="tw_main">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_cooking">
        <attribute name="title">
@@ -95,7 +95,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Start cooking</string>
+            <string>Start / replay cooking</string>
            </property>
           </widget>
          </item>

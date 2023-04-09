@@ -58,7 +58,10 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::OnKeyboardPressed(int key){
-    qDebug() << "Key pressed:" << key;
+    if(key == GetCurrentProfile().key_start_cooking()){
+        qInfo() << "Start cooking!";
+        m_cooker.StartCooking(sot::CookingType::kFish);
+    }
 }
 
 void MainWindow::ConnectButton(QPushButton* pb,

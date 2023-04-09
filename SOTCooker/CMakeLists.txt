@@ -131,6 +131,7 @@ target_link_libraries(${EXE_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Network
     libSimpleUpdater::libSimpleUpdater
     CookerProto::CookerProto
+    SotTools::SotTools
     QtWindowsUtils::QtWindowsUtils
     ${PROTOBUF_LIBRARIES}
 )
