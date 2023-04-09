@@ -106,6 +106,8 @@ set(PROJECT_SOURCES
         MainWindow.cpp
         MainWindow.hpp
         MainWindow.ui
+
+        GraphicsUtils.hpp
 )
 
 
