@@ -248,8 +248,18 @@ bool setCoreCountAffinity(int32_t coreCountToUse, bool throwOnFail, bool verbose
 
 /* --- Keyboard --- */
 
+QString GetVkStr(int32_t keyCode){
+    if(keyCode < 0){
+        return {};
+    }
+    QString text{win::virtualKeyCodeToString(static_cast<uint32_t>(keyCode))};
+    if(text.contains(QChar{65533})){
+        text = win::vkCodeToStr_limited(keyCode);
+    }
+    return text;
+}
 
-QString vkCodeToStr(int32_t keyCode){
+QString vkCodeToStr_limited(int32_t keyCode){
     static bool firstCall{true};
     static bool canProceed{false};
 

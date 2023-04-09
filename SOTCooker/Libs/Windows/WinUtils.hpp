@@ -45,7 +45,9 @@ bool setCoreCountAffinity(int32_t coreCountToUse,bool throwOnFail = false,bool v
 
 constexpr unsigned int EXTENDED_FLAG = 0x100;
 
-QString vkCodeToStr(int32_t keyCode);
+QString GetVkStr(int32_t keyCode);
+
+QString vkCodeToStr_limited(int32_t keyCode);
 
 void sendKeyboardEvent(int code, bool pressed,int codeAlias = 0);
 
