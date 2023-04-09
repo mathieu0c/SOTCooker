@@ -1,0 +1,12 @@
+{
+    "finalizeUpdateCommand": "",
+    "minVersionRequired": {
+        "major": 1,
+        "minor": 0,
+        "patch": 0
+    },
+    "updateFileList": [
+        ".exe"
+    ],
+    "updatedTagFile": "UPDATED.TAG"
+}
