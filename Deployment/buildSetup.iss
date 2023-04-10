@@ -4,6 +4,7 @@
 
 #define MyAppName "SOTCooker"
 #define MyAppVersion "0.X.X"
+#define MyAppPublisher "mathieu0c"
 #define MyAppExeName "SOTCooker.exe"
 #define MyAppURL "https://github.com/mathieu0c/SOTCooker"
 
@@ -17,7 +18,10 @@ AppId={{20373FA7-5CD0-4D87-91AC-95F5A14CBED7}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
+AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
+AppSupportURL={#MyAppURL}
+AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
 DisableProgramGroupPage=yes
 LicenseFile=E:\NetworkShared\SOTCooker\LICENSE
