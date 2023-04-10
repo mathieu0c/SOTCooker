@@ -95,14 +95,6 @@ def main():
 
     GLOB_TARGET_EXE_NAME = "SOTCooker"
 
-    dependencies = []
-    # dependencies.append((f"{CONFIG_DEPENDENCY_DIR}/SDL2.dll",CONFIG_outputDir))
-
-    uselessFileList = []
-    uselessFileList.append(f"{CONFIG_outputDir}/opengl32sw.dll")
-    uselessFileList.append(f"{CONFIG_outputDir}/D3Dcompiler_47.dll")
-    uselessFileList.append(f"{CONFIG_outputDir}/Qt6Svg.dll")
-
 
     print("------------------------------------------------------")
 
@@ -121,6 +113,23 @@ def main():
     if(CONFIG_outputDir == "AUTO"):
         CONFIG_outputDir = "./{}/{}".format(CONFIG_DEPLOY_OUTPUT_DIR,pathlib.Path(exePath).stem+"_release")
         CONFIG_outputAssetDir = f"{CONFIG_outputDir}/Assets/"
+
+
+    
+
+
+
+    uselessFileList = []
+    uselessFileList.append(f"{CONFIG_outputDir}/opengl32sw.dll")
+    uselessFileList.append(f"{CONFIG_outputDir}/D3Dcompiler_47.dll")
+    uselessFileList.append(f"{CONFIG_outputDir}/Qt6Svg.dll")
+
+    
+    dependencies = []
+    dependencies.append((f"{CONFIG_PUBLIC_VERIFIER_KEY_FILE}",CONFIG_outputAssetDir))
+    
+
+
 
 
     print("Creating deploy dir <{}> ...".format(CONFIG_outputDir))
@@ -150,7 +159,7 @@ def main():
     windeployCmd = "{} {} {}".format(CONFIG_WINDEPLOYQT_PATH,CONFIG_outputDir,exePath)
     print("\tusing command <{}>".format(windeployCmd))
     if(os.system(windeployCmd)):#if windeployqt failed
-        errorOccured("windeployqt failed to execute properly.",True)
+        errorOccured("WARNING: windeployqt may have failed to execute properly.",False)
     print("Done")
 
 

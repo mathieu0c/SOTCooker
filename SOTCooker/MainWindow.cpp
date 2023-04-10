@@ -21,7 +21,10 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow),
       c_appdata_folder{QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+"/"},
-      c_config_file{QString{"%0config.json"}.arg(c_appdata_folder)}
+      c_config_file{QString{"%0config.json"}.arg(c_appdata_folder)},
+      m_updateHandler{new updt::UpdateHandler(consts::CURRENT_VERSION,consts::PROJECT_GITHUB_RELEASE,
+                                              consts::PUBLIC_VERIFIER_KEY_FILE,true,consts::POST_UPDATE_CMD,
+                                              true,this)}
 {
     ui->setupUi(this);
 
@@ -59,6 +62,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&m_cooker,&sot::Cooker::StartedCooking,this,&MainWindow::OnCookerStarted);
     connect(&m_cooker,&sot::Cooker::FinishedCooking,this,&MainWindow::OnCookerFinished);
     connect(&m_cooker,&sot::Cooker::CookingCancelled,this,&MainWindow::OnCookerCancelled);
+
+    std::function<void(void)> nothing{[](){}};
+    const auto kWasUpdated{updt::acquireUpdated(nothing,consts::UPDATED_TAG_FILENAME)};
+    qInfo() << "Was updated?" << kWasUpdated;
 }
 
 MainWindow::~MainWindow()
@@ -207,3 +214,9 @@ void MainWindow::UpdateAllButtonsTexts(){
         UpdateButtonText(pb,std::invoke(mutators.getter,GetCurrentProfile()));
     }
 }
+
+void MainWindow::on_action_check_updates_triggered()
+{
+    m_updateHandler->show();
+}
+

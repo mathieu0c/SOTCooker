@@ -26,7 +26,7 @@
     <item>
      <widget class="QTabWidget" name="tw_main">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_cooking">
        <attribute name="title">
@@ -396,8 +396,20 @@
      <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="action_check_updates"/>
+   </widget>
+   <addaction name="menuTools"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="action_check_updates">
+   <property name="text">
+    <string>Check updates</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

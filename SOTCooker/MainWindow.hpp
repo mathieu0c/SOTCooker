@@ -1,6 +1,9 @@
 #ifndef MAINWINDOW_HPP
 #define MAINWINDOW_HPP
 
+#include <Constants.hpp>
+
+#include <UpdateHandler.hpp>
 #include <WinUtils.hpp>
 #include <QMainWindow>
 #include <QPushButton>
@@ -48,6 +51,8 @@ private slots:
 
     void OnGetRemainingTimeRequested();
 
+    void on_action_check_updates_triggered();
+
 private:
     sot::KeyboardProfile& GetCurrentProfile(){
         return m_config;
@@ -79,6 +84,8 @@ private:
 
     const QString c_appdata_folder;
     const QString c_config_file;
+
+    updt::UpdateHandler* m_updateHandler;
 
     sot::KeyboardProfile m_config{};
     std::unordered_map<QPushButton*,KeyboardProfileMutators<int>> m_pb_links{};

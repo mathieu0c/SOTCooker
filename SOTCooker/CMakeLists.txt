@@ -101,6 +101,8 @@ set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/Assets/iconResource.r
 
 set(PROJECT_SOURCES
         LoggerHandler.hpp
+
+        Constants.hpp
         
         main.cpp
         MainWindow.cpp
@@ -171,9 +173,9 @@ add_definitions("-DCMAKE_PROGRAM_NAME=\"${EXE_NAME}\"")
 
 #define LOG_HANDLER_BASE_DIR_QSTRING
 IF(CMAKE_BUILD_TYPE MATCHES Debug)
-    set(LOG_HANDLER_BASE_DIR_MACRO "-DLOG_HANDLER_BASE_DIR_QSTRING=QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+\"/\"+QString{\"${EXE_NAME}\"}" CACHE BOOL "" FORCE)
-ELSE()
     set(LOG_HANDLER_BASE_DIR_MACRO "-DLOG_HANDLER_BASE_DIR_QSTRING=QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+\"/\"+QString{\"${EXE_NAME}_debug\"}" CACHE BOOL "" FORCE)
+ELSE()
+    set(LOG_HANDLER_BASE_DIR_MACRO "-DLOG_HANDLER_BASE_DIR_QSTRING=QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+\"/\"+QString{\"${EXE_NAME}\"}" CACHE BOOL "" FORCE)
 ENDIF()
 
 add_definitions(${LOG_HANDLER_BASE_DIR_MACRO})
