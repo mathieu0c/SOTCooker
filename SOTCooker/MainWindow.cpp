@@ -2,6 +2,7 @@
 #include "./ui_MainWindow.h"
 
 #include "GraphicsUtils.hpp"
+#include "CircularProgressBar.hpp"
 
 #include <WinUtils.hpp>
 #include <WinEventHandler.hpp>
@@ -12,6 +13,8 @@
 #include <QMessageBox>
 
 #include <QDebug>
+
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -50,6 +53,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     ConnectButtons();
     UpdateAllButtonsTexts();
+
+    connect(&m_cooker,&sot::Cooker::Progress,this,&MainWindow::OnCookerProgress);
+    connect(&m_cooker,&sot::Cooker::StartedCooking,this,&MainWindow::OnCookerStarted);
 }
 
 MainWindow::~MainWindow()
@@ -63,6 +69,22 @@ void MainWindow::OnKeyboardPressed(int key){
         m_cooker.StartCooking(sot::CookingType::kFish);
     }
 }
+
+void MainWindow::OnCookerStarted(const sot::CookingType type){
+    ui->lbl_type->setText(GetTypeHumanStr(type));
+}
+
+void MainWindow::OnCookerProgress(const double kPercentage){
+    ui->cpb_cooking->SetPercentage(kPercentage);
+    const auto kRemaining{m_cooker.Timer().GetRemainingTime()};
+    if(!kRemaining.isValid()){
+        return;
+    }
+    const auto kTimeStr{kRemaining.toString("mm:ss")};
+    ui->lbl_remaining_time->setText(kTimeStr);
+}
+
+
 
 void MainWindow::ConnectButton(QPushButton* pb,
                                KeyboardProfileMutators<int> mutators){

@@ -108,6 +108,9 @@ set(PROJECT_SOURCES
         MainWindow.ui
 
         GraphicsUtils.hpp
+        CircularProgressBar.hpp
+
+        ProgResources.qrc
 )
 
 

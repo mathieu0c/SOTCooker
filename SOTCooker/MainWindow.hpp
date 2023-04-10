@@ -20,6 +20,8 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+    const QColor kBaseBlueColor{25,180,255};
+
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
@@ -38,6 +40,9 @@ public:
 
 private slots:
     void OnKeyboardPressed(int key);
+
+    void OnCookerStarted(const sot::CookingType type);
+    void OnCookerProgress(const double kPercentage);
 
 private:
     sot::KeyboardProfile& GetCurrentProfile(){

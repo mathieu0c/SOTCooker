@@ -7,9 +7,7 @@ Cooker::Cooker(QObject* parent) : QObject{parent},
 {
     connect(&m_cooking_timer,&ProgressTimer::Timeout,this,&Cooker::OnCookingFinished);
 
-    connect(&m_cooking_timer,&ProgressTimer::Progress,this,[&](const double percentage){
-        qDebug().nospace() << "\tCooking progress:" << percentage;
-    });
+    connect(&m_cooking_timer,&ProgressTimer::Progress,this,&Cooker::OnCookingProgress);
 }
 
 void Cooker::StartCooking(sot::CookingType type){
@@ -25,10 +23,15 @@ void Cooker::StartCooking(sot::CookingType type){
     m_cooking_timer.SetInterval(kMsInterval);
     m_cooking_timer.Start();
     qInfo() << "Starting cooking for:" << kMsInterval << "ms (" << GetTypeHumanStr(m_cooking_type) << ")";
+    emit StartedCooking(m_cooking_type);
 }
 
 void Cooker::OnCookingFinished(){
     qInfo() << "Finished cooking" << GetTypeHumanStr(m_cooking_type);
+}
+
+void Cooker::OnCookingProgress(const double kPercentage){
+    emit Progress(kPercentage);
 }
 
 }//namesapce sot

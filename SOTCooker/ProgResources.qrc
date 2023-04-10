@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Assets/Fonts/LEMONMILK-Bold.otf</file>
+    </qresource>
+</RCC>

@@ -18,6 +18,9 @@
   <property name="windowTitle">
    <string>Sea Of Thieves Cooker</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QLabel{color:rgb(25,180,255);font-weight: bold;}</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
@@ -29,6 +32,55 @@
        <attribute name="title">
         <string>Cooking</string>
        </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="CircularProgressBar" name="cpb_cooking" native="true"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="lbl_type">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>26</pointsize>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>-</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="lbl_remaining_time">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>26</pointsize>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>-</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
       <widget class="QScrollArea" name="tab_settings">
        <property name="horizontalScrollBarPolicy">
@@ -46,7 +98,7 @@
           <x>0</x>
           <y>0</y>
           <width>704</width>
-          <height>428</height>
+          <height>443</height>
          </rect>
         </property>
         <property name="font">
@@ -92,6 +144,7 @@
            <property name="font">
             <font>
              <pointsize>12</pointsize>
+             <bold>true</bold>
             </font>
            </property>
            <property name="text">
@@ -124,12 +177,20 @@
      <x>0</x>
      <y>0</y>
      <width>728</width>
-     <height>27</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CircularProgressBar</class>
+   <extends>QWidget</extends>
+   <header>CircularProgressBar.hpp</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

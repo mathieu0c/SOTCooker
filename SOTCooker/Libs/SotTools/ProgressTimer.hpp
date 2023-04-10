@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QTimer>
+#include <QTime>
 
 #include <QDebug>
 
@@ -25,7 +26,8 @@ public:
         } else {
             m_total_timer.start(msec);
         }
-        m_progress_timer.start(m_total_timer.interval()/200);
+        m_progress_timer.start(32);
+        emit Progress(0);
     }
     void Stop(){
         m_total_timer.stop();
@@ -40,9 +42,16 @@ public:
         return m_total_timer.isActive();
     }
 
-    double GetProgress(){
+    double GetProgress()const{
         const double kRemainingPercentage{static_cast<double>(m_total_timer.remainingTime()) / static_cast<double>(m_total_timer.interval()) * 100};
         return 100. - kRemainingPercentage;
+    }
+
+    int GetRemainingTimeMs() const{
+        return m_total_timer.remainingTime();
+    }
+    QTime GetRemainingTime() const{
+        return QTime::fromMSecsSinceStartOfDay(GetRemainingTimeMs());
     }
 
 public slots:
@@ -60,6 +69,7 @@ signals:
 private:
     void OnTotalTimeout(){
         m_progress_timer.stop();
+        emit Progress(100.);
         emit Timeout();
     }
 

@@ -10,6 +10,7 @@ enum CookingType{
     kMeat       = 60;
     kKraken     = 60;
     kMegalodon  = 90;
+    kTest       = 5;
 }
 
 message KeyboardProfile{//keyboard keys used to execute actions
