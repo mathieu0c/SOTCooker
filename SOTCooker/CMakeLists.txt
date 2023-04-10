@@ -136,6 +136,7 @@ target_link_libraries(${EXE_NAME} PRIVATE
     CookerProto::CookerProto
     SotTools::SotTools
     QtWindowsUtils::QtWindowsUtils
+    TextToSpeech::TextToSpeech
     ${PROTOBUF_LIBRARIES}
 )
 

@@ -26,8 +26,18 @@ void Cooker::StartCooking(sot::CookingType type){
     emit StartedCooking(m_cooking_type);
 }
 
+void Cooker::Cancel(){
+    if(!m_cooking_timer.IsActive()){
+        return;
+    }
+
+    m_cooking_timer.Stop();
+    emit CookingCancelled(m_cooking_type);
+}
+
 void Cooker::OnCookingFinished(){
     qInfo() << "Finished cooking" << GetTypeHumanStr(m_cooking_type);
+    emit FinishedCooking(m_cooking_type);
 }
 
 void Cooker::OnCookingProgress(const double kPercentage){

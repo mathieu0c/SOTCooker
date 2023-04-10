@@ -4,6 +4,7 @@
 #include <QLocale>
 #include <QTranslator>
 #include <QFontDatabase>
+#include <TextToSpeech.hpp>
 
 #include "LoggerHandler.hpp"
 
@@ -17,6 +18,10 @@ int main(int argc, char *argv[])
 
     const QFont kBaseFont{"LEMONMILK"};
     QApplication::setFont(kBaseFont);
+
+    cus::TextPlayer::Init();
+    cus::TextPlayer::SetLocale(QLocale{"en"});
+    cus::TextPlayer::SetRate(0.3);
 
     MainWindow w;
     w.show();

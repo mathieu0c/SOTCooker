@@ -83,7 +83,7 @@ def getExePath(releaseDir : str,exeRegex:str = None) -> str:
 def main():
     global GLOB_TARGET_EXE_NAME
     CONFIG_outputDir = "AUTO"#the dir will have the name of the found executable
-    CONFIG_WINDEPLOYQT_PATH = "C:/Qt/6.2.4/mingw_64/bin/windeployqt.exe"
+    CONFIG_WINDEPLOYQT_PATH = "C:/Qt/6.5.0/mingw_64/bin/windeployqt.exe"
     CONFIG_DEPENDENCY_DIR = "../SOTCooker/Assets/Dependencies"
     CONFIG_INNOSETUP_SCRIPT = "./buildSetup.iss"
     CONFIG_DEPLOY_OUTPUT_DIR = "./DEPLOY_OUTPUT"

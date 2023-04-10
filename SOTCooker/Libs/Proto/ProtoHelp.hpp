@@ -30,6 +30,16 @@ concept FromPbMessage = std::is_base_of<google::protobuf::Message, T>::value;
 
 /* --- Generic protobuf functions --- */
 
+template<FromPbMessage Proto_t,typename MessageOption_t>
+auto GetMessageOption(const MessageOption_t& option){
+    return Proto_t::GetDescriptor()->options().GetExtension(option);
+}
+
+template<FromPbMessage Proto_t,typename MessageFieldOption_t>
+auto GetFieldOption(int field_number,const MessageFieldOption_t& option){
+    return Proto_t::GetDescriptor()->FindFieldByNumber(field_number)->options().GetExtension(option);
+}
+
 template<FromPbMessage Proto_t>
 Proto_t InitNonInitilizedFields(const Proto_t& message, Proto_t def){
     def.MergeFrom(message);

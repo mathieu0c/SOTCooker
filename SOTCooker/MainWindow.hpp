@@ -43,6 +43,10 @@ private slots:
 
     void OnCookerStarted(const sot::CookingType type);
     void OnCookerProgress(const double kPercentage);
+    void OnCookerFinished(const sot::CookingType type);
+    void OnCookerCancelled(const sot::CookingType type);
+
+    void OnGetRemainingTimeRequested();
 
 private:
     sot::KeyboardProfile& GetCurrentProfile(){

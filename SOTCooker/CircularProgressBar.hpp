@@ -48,7 +48,7 @@ protected:
         //progress path
         path.moveTo(kStartingPoint);
         path.arcTo(kArcRect, 90, -pd);
-        QConicalGradient gradient(kArcRect.center(),91.5);
+        QConicalGradient gradient(kArcRect.center(),92.5);
         gradient.setColorAt(1.,kBaseProgressColor);
         gradient.setColorAt(0.,kEndColor);
         p.strokePath(path, QPen(gradient,kStrokeWidth));

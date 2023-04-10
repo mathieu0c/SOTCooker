@@ -7,6 +7,7 @@
 #include <WinUtils.hpp>
 #include <WinEventHandler.hpp>
 #include <DialogGetKeyCode.hpp>
+#include <TextToSpeech.hpp>
 
 #include <QStandardPaths>
 #include <QFileInfo>
@@ -56,6 +57,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(&m_cooker,&sot::Cooker::Progress,this,&MainWindow::OnCookerProgress);
     connect(&m_cooker,&sot::Cooker::StartedCooking,this,&MainWindow::OnCookerStarted);
+    connect(&m_cooker,&sot::Cooker::FinishedCooking,this,&MainWindow::OnCookerFinished);
+    connect(&m_cooker,&sot::Cooker::CookingCancelled,this,&MainWindow::OnCookerCancelled);
 }
 
 MainWindow::~MainWindow()
@@ -64,14 +67,34 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::OnKeyboardPressed(int key){
-    if(key == GetCurrentProfile().key_start_cooking()){
+    sot::ForEachKeyWithCookingType(GetCurrentProfile(),[&](int32_t action_key,sot::CookingType cooking_type){
+        if(key != action_key){
+            return;
+        }
+
         qInfo() << "Start cooking!";
-        m_cooker.StartCooking(sot::CookingType::kFish);
+        if(cooking_type == sot::CookingType::kRestart){
+            if(m_cooker.CookingType() == sot::CookingType::kNone){
+                cooking_type = sot::CookingType::kFish;
+            } else {
+                cooking_type = m_cooker.CookingType();
+            }
+        }
+        m_cooker.StartCooking(cooking_type);
+    });
+
+    if(key == GetCurrentProfile().key_get_remaining_time()){
+        OnGetRemainingTimeRequested();
+    } else if(key == GetCurrentProfile().key_cancel_cooking()){
+        m_cooker.Cancel();
     }
 }
 
 void MainWindow::OnCookerStarted(const sot::CookingType type){
-    ui->lbl_type->setText(GetTypeHumanStr(type));
+    const auto kTypeStr{GetTypeHumanStr(type)};
+    ui->lbl_type->setText(kTypeStr);
+    const QString kAudioNotification{tr("%0 started").arg(kTypeStr)};
+    cus::TextPlayer::Play(kAudioNotification);
 }
 
 void MainWindow::OnCookerProgress(const double kPercentage){
@@ -84,6 +107,38 @@ void MainWindow::OnCookerProgress(const double kPercentage){
     ui->lbl_remaining_time->setText(kTimeStr);
 }
 
+void MainWindow::OnCookerFinished(const sot::CookingType type){
+    ui->cpb_cooking->SetPercentage(100.);
+    const auto kRemaining{QTime::fromMSecsSinceStartOfDay(0)};
+    const auto kTimeStr{kRemaining.toString("mm:ss")};
+    ui->lbl_remaining_time->setText(kTimeStr);
+
+    const auto kTypeStr{GetTypeHumanStr(type)};
+    const QString kAudioNotification{tr("%0 ready!").arg(kTypeStr)};
+    cus::TextPlayer::Play(kAudioNotification);
+}
+
+void MainWindow::OnCookerCancelled(const sot::CookingType type){
+    ui->cpb_cooking->SetPercentage(100.);
+    const auto kRemaining{QTime::fromMSecsSinceStartOfDay(0)};
+    const auto kTimeStr{kRemaining.toString("mm:ss")};
+    ui->lbl_remaining_time->setText(kTimeStr);
+
+    const auto kTypeStr{GetTypeHumanStr(type)};
+    const QString kAudioNotification{tr("%0 cancelled!").arg(kTypeStr)};
+    cus::TextPlayer::Play(kAudioNotification);
+}
+
+
+void MainWindow::OnGetRemainingTimeRequested(){
+    const auto kRemaining{m_cooker.Timer().GetRemainingTime()};
+    if(!kRemaining.isValid()){
+        return;
+    }
+    const auto kRemainingSeconds{kRemaining.second()+kRemaining.minute()*60};
+    const auto kTimeStr{tr("%0 seconds").arg(kRemainingSeconds)};
+    cus::TextPlayer::Play(kTimeStr);
+}
 
 
 void MainWindow::ConnectButton(QPushButton* pb,
@@ -111,6 +166,40 @@ void MainWindow::ConnectButtons(){
     ConnectButton(ui->pb_key_start_cooking,
                   {&sot::KeyboardProfile::set_key_start_cooking,
                   &sot::KeyboardProfile::key_start_cooking});
+
+    ConnectButton(ui->pb_key_start_cook_fish,
+                  {&sot::KeyboardProfile::set_key_start_cooking_fish,
+                  &sot::KeyboardProfile::key_start_cooking_fish});
+
+    ConnectButton(ui->pb_key_start_cook_trophyfish,
+                  {&sot::KeyboardProfile::set_key_start_cooking_trophy_fish,
+                  &sot::KeyboardProfile::key_start_cooking_trophy_fish});
+
+    ConnectButton(ui->pb_key_start_cook_meat,
+                  {&sot::KeyboardProfile::set_key_start_cooking_meat,
+                  &sot::KeyboardProfile::key_start_cooking_meat});
+
+    ConnectButton(ui->pb_key_start_cook_kraken,
+                  {&sot::KeyboardProfile::set_key_start_cooking_kraken,
+                  &sot::KeyboardProfile::key_start_cooking_kraken});
+
+    ConnectButton(ui->pb_key_start_cook_megalodon,
+                  {&sot::KeyboardProfile::set_key_start_cooking_megalodon,
+                  &sot::KeyboardProfile::key_start_cooking_megalodon});
+
+
+    ConnectButton(ui->pb_key_start_cook_cache,
+                  {&sot::KeyboardProfile::set_key_start_cooking_cache,
+                  &sot::KeyboardProfile::key_start_cooking_cache});
+
+
+    ConnectButton(ui->pb_key_get_remaining_time,
+                  {&sot::KeyboardProfile::set_key_get_remaining_time,
+                  &sot::KeyboardProfile::key_get_remaining_time});
+
+    ConnectButton(ui->pb_key_cancel,
+                  {&sot::KeyboardProfile::set_key_cancel_cooking,
+                  &sot::KeyboardProfile::key_cancel_cooking});
 }
 
 void MainWindow::UpdateAllButtonsTexts(){
