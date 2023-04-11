@@ -9,6 +9,7 @@
 #include <DialogGetKeyCode.hpp>
 #include <TextToSpeech.hpp>
 #include <SOTCooker.hpp>
+#include <SOTCookerUtils.hpp>
 
 #include <QStandardPaths>
 #include <QFileInfo>
@@ -145,9 +146,7 @@ void MainWindow::OnGetRemainingTimeRequested(){
     if(!kRemaining.isValid()){
         return;
     }
-    const auto kRemainingSeconds{kRemaining.second()+kRemaining.minute()*60};
-    const auto kTimeStr{tr("%0 seconds").arg(kRemainingSeconds)};
-    cus::TextPlayer::Play(kTimeStr);
+    cus::TextPlayer::Play(sot::GetAudioTimeStr(kRemaining));
 }
 
 

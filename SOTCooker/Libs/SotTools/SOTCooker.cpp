@@ -1,13 +1,18 @@
 #include "SOTCooker.hpp"
 
+#include "SOTCookerUtils.hpp"
+
 namespace sot {
 
 Cooker::Cooker(QObject* parent) : QObject{parent},
-    m_cooking_timer{this}
+    m_cooking_timer{this},
+    m_notifier{this}
 {
     connect(&m_cooking_timer,&ProgressTimer::Timeout,this,&Cooker::OnCookingFinished);
 
     connect(&m_cooking_timer,&ProgressTimer::Progress,this,&Cooker::OnCookingProgress);
+
+    connect(&m_cooking_timer,&ProgressTimer::ProgressRemainingMs,&m_notifier,&CookerAudioProgressNotifier::Update);
 }
 
 void Cooker::StartCooking(sot::CookingType type){
@@ -44,6 +49,7 @@ void Cooker::StartCooking(sot::CookingType type){
     m_cooking_timer.Start();
     qInfo() << "Starting cooking for:" << kMsInterval << "ms (" << GetTypeHumanStr(m_cooking_type) << ")";
     emit StartedCooking(m_cooking_type);
+    m_notifier.SetCooking(m_cooking_type);
 }
 
 void Cooker::Cancel(){
