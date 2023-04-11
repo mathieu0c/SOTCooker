@@ -8,7 +8,7 @@ endif(UNIX)
 
 #VERSION = MAJOR.MINOR.PATCH
 set(VERSIONING_MAJOR 0)#incompatible update
-set(VERSIONING_MINOR 0)#new features added
+set(VERSIONING_MINOR 1)#new features added
 set(VERSIONING_PATCH 0)#bug fixed / minor change
 
 
