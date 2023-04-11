@@ -22,8 +22,8 @@ enum CookingType{
     kTrophyFish = 3   [(cooking_time) = 94];
     kMeat       = 4   [(cooking_time) = 64];
     kKraken     = 5   [(cooking_time) = 124];
-    kMegalodon  = 6   [(cooking_time) = 124];
-    kCache      = 7   [(cooking_time) = 179, (loop_to) = kFish];//last value must have (loop_to) defined
+    kMegalodon  = 6   [(cooking_time) = 124, (loop_to) = kFish];
+    kCache      = 97  [(cooking_time) = 179];//last value must have (loop_to) defined
     kCycle      = 98;
     kTest       = 99  [(cooking_time) = 5];
 }
