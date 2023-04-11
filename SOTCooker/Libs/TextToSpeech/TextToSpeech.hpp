@@ -76,7 +76,7 @@ public:
 
     static void SetVolume(double volume){
         assert(volume <= 1 && volume >= 0 && "Volume has to be in [0,1]");
-        i().Speech()->volume();
+        i().Speech()->setVolume(volume);
     }
     static auto Volume(){
         return ci().Speech()->volume();

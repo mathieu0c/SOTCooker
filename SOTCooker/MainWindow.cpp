@@ -8,6 +8,7 @@
 #include <WinEventHandler.hpp>
 #include <DialogGetKeyCode.hpp>
 #include <TextToSpeech.hpp>
+#include <SOTCooker.hpp>
 
 #include <QStandardPaths>
 #include <QFileInfo>
@@ -15,6 +16,13 @@
 
 #include <QDebug>
 
+namespace{
+
+void test(){
+
+}
+
+}
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -32,6 +40,8 @@ MainWindow::MainWindow(QWidget *parent)
         qInfo() << "Saving default keyboard profile";
         SaveKeyboardProfile();
     }
+
+    test();
 
     const auto kPbOpt{pb::ReadFromFile<sot::KeyboardProfile>(c_config_file)};
     if(!kPbOpt && false){
@@ -80,13 +90,6 @@ void MainWindow::OnKeyboardPressed(int key){
         }
 
         qInfo() << "Start cooking!";
-        if(cooking_type == sot::CookingType::kRestart){
-            if(m_cooker.CookingType() == sot::CookingType::kNone){
-                cooking_type = sot::CookingType::kFish;
-            } else {
-                cooking_type = m_cooker.CookingType();
-            }
-        }
         m_cooker.StartCooking(cooking_type);
     });
 
@@ -193,6 +196,11 @@ void MainWindow::ConnectButtons(){
     ConnectButton(ui->pb_key_start_cook_megalodon,
                   {&sot::KeyboardProfile::set_key_start_cooking_megalodon,
                   &sot::KeyboardProfile::key_start_cooking_megalodon});
+
+
+    ConnectButton(ui->pb_key_start_cook_cycle,
+                  {&sot::KeyboardProfile::set_key_start_cooking_cycle,
+                  &sot::KeyboardProfile::key_start_cooking_cycle});
 
 
     ConnectButton(ui->pb_key_start_cook_cache,

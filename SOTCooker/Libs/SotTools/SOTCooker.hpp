@@ -10,6 +10,7 @@ namespace sot {
 inline
 int32_t GetCookingMs(sot::CookingType type){
     const auto* kEnumDesc{google::protobuf::GetEnumDescriptor<decltype(type)>()};
+
     const auto kSeconds{kEnumDesc->value(type)->options().GetExtension(sot::cooking_time)};
 #ifdef CMAKE_DEBUG_MODE
     return static_cast<int32_t>(kSeconds*20.);

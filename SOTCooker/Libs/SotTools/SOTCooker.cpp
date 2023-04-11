@@ -11,8 +11,30 @@ Cooker::Cooker(QObject* parent) : QObject{parent},
 }
 
 void Cooker::StartCooking(sot::CookingType type){
+    //this value must not be sot::CookingType::kCycle or sot::CookingType::kRestart
     const auto kPreviousCookingType{m_cooking_type};
-    m_cooking_type = type;
+
+    if(type != sot::CookingType::kCycle && type != sot::CookingType::kRestart){
+        m_cooking_type = type;
+    }
+
+    //handling special cooking types
+    if (type == sot::CookingType::kCycle){
+        if(IsCooking()){
+            m_cooking_type = sot::CycleType(m_cooking_type);
+        } else {
+            m_cooking_type = sot::CookingType::kRestart;
+        }
+    }
+    if(m_cooking_type == sot::CookingType::kRestart){
+        if(m_cooking_type == sot::CookingType::kNone){
+            m_cooking_type = sot::CookingType::kFish;
+        } else {
+            m_cooking_type = kPreviousCookingType;
+        }
+    }
+
+    assert(m_cooking_type != sot::CookingType::kCycle && m_cooking_type != sot::CookingType::kRestart);
 
     if(IsCooking()){
         qWarning() << "Was already cooking a" << GetTypeHumanStr(kPreviousCookingType);

@@ -3,6 +3,7 @@
 #include "SOTCookerDefaults.hpp" //NOLINT
 #include "ProtoHelp.hpp"//NOLINT
 #include "CookerProtoConstants.hpp"//NOLINT
+#include "SOTCooker.pb.h"
 
 namespace sot{
 
@@ -36,6 +37,24 @@ int32_t ForEachKeyWithCookingType(const sot::KeyboardProfile& msg,Lambda_t to_ap
     };
     pb::ApplyOnPbFields(&msg,internal_to_apply);
     return match_count;
+}
+
+
+inline
+CookingType CycleType(const CookingType& kCookingType){
+    const auto* kEnumDesc{google::protobuf::GetEnumDescriptor<CookingType>()};
+//    qDebug() << "Value count:" << kEnumDesc->value_count();
+
+    const auto kLoopTo{kEnumDesc->FindValueByNumber(kCookingType)->options().GetExtension(sot::loop_to)};
+//    qDebug() << "kLoopTo:" << GetEnumValueName(kLoopTo);
+    if(kLoopTo != CookingType::kNone){
+        return kLoopTo;
+    }
+
+    const auto kNextIndex{(kEnumDesc->FindValueByNumber(kCookingType)->index()+1)%kEnumDesc->value_count()};
+    const auto kNextVal{kEnumDesc->value(kNextIndex)};
+
+    return static_cast<CookingType>(kNextVal->number());
 }
 
 }//namespace sot

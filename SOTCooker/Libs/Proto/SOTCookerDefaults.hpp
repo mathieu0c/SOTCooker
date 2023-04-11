@@ -35,7 +35,7 @@ sot::KeyboardProfile GetDefault(){
 
     out.set_profile_name("Default");
 
-    constexpr auto kExpectedKeyFieldCount{9};
+    constexpr auto kExpectedKeyFieldCount{10};
 
     int32_t keyFieldCount{InitKeysToDefault(&out)};
 
