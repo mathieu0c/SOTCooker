@@ -5,24 +5,9 @@
 
 #include <CookerProto.hpp>
 
+#include "CookerAudioProgressNotifier.hpp"
+
 namespace sot {
-
-inline
-int32_t GetCookingMs(sot::CookingType type){
-    const auto* kEnumDesc{google::protobuf::GetEnumDescriptor<decltype(type)>()};
-
-    const auto kSeconds{kEnumDesc->value(type)->options().GetExtension(sot::cooking_time)};
-#ifdef CMAKE_DEBUG_MODE
-    return static_cast<int32_t>(kSeconds*20.);
-#else
-    return static_cast<int32_t>(kSeconds*1000.);
-#endif
-}
-
-inline
-QString GetTypeHumanStr(sot::CookingType type){
-    return GetEnumValueName(type).mid(1);
-}
 
 class Cooker : public QObject{
     Q_OBJECT
@@ -64,6 +49,7 @@ private slots:
 private:
     ProgressTimer m_cooking_timer;
     sot::CookingType m_cooking_type{sot::CookingType::kNone};
+    CookerAudioProgressNotifier m_notifier;
 };
 
 }//namesapce sot

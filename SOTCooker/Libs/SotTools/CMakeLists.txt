@@ -24,6 +24,7 @@ target_link_libraries("${target_name}"
     PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
     CookerProto::CookerProto
+    TextToSpeech::TextToSpeech
 )
 
 target_include_directories(${target_name}
