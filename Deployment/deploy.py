@@ -7,6 +7,7 @@ import inspect
 import pathlib
 import shutil
 import subprocess
+import time
 
 GLOB_TARGET_EXE_NAME = ""
 
@@ -45,8 +46,8 @@ def mkpathOverwrite(path : str) -> bool:
 def checkFile(path : str)->bool:
     tmpPath = pathlib.Path(path)
     isFile = tmpPath.is_file()
-    exis = tmpPath.exists()
-    if((not tmpPath.is_file()) or (not tmpPath.exists())):
+    exist = tmpPath.exists()
+    if((not isFile) or (not exist)):
         return False
     return True
 
@@ -80,18 +81,23 @@ def getExePath(releaseDir : str,exeRegex:str = None) -> str:
     return tmpList[0]
 
 
+def getAbsolute(path: str)->str:
+    return str(pathlib.Path(path).absolute())
+
 def main():
     global GLOB_TARGET_EXE_NAME
     CONFIG_outputDir = "AUTO"#the dir will have the name of the found executable
-    CONFIG_WINDEPLOYQT_PATH = "C:/Qt/6.5.0/mingw_64/bin/windeployqt.exe"
-    CONFIG_DEPENDENCY_DIR = "../SOTCooker/Assets/Dependencies"
-    CONFIG_INNOSETUP_SCRIPT = "./buildSetup.iss"
-    CONFIG_DEPLOY_OUTPUT_DIR = "./DEPLOY_OUTPUT"
+    QT_VERSION = "6.5.0"
+    MINGW_VERSION = "mingw1120_64"
+    CONFIG_WINDEPLOYQT_PATH = getAbsolute(f"C:/Qt/{QT_VERSION}/mingw_64/bin/windeployqt.exe")
+    CONFIG_DEPENDENCY_DIR = getAbsolute("../SOTCooker/Assets/Dependencies")
+    CONFIG_INNOSETUP_SCRIPT = getAbsolute("./buildSetup.iss")
+    CONFIG_DEPLOY_OUTPUT_DIR = "DEPLOY_OUTPUT"
 
-    CONFIG_PRIVATE_SIGNER_KEY_FILE = "../SOTCookerUpdateKeys/SOTCooker.private"
-    CONFIG_PUBLIC_VERIFIER_KEY_FILE = "../SOTCookerUpdateKeys/SOTCooker.public"
+    CONFIG_PRIVATE_SIGNER_KEY_FILE = getAbsolute("../SOTCookerUpdateKeys/SOTCooker.private")
+    CONFIG_PUBLIC_VERIFIER_KEY_FILE = getAbsolute("../SOTCookerUpdateKeys/SOTCooker.public")
     CONFIG_MANIFEST_FILE = "manifest.json"
-    CONFIG_outputAssetDir = f"{CONFIG_outputDir}/Assets/"
+    CONFIG_outputAssetDir = getAbsolute(f"{CONFIG_outputDir}/Assets/")
 
     GLOB_TARGET_EXE_NAME = "SOTCooker"
 
@@ -100,19 +106,19 @@ def main():
 
 
 
-    releaseDir = getReleaseDir("..")
+    releaseDir = getAbsolute(getReleaseDir(".."))
     if(not releaseDir):
         errorOccured("Cannot find release dir",True)
     print("Found build release dir at : {}".format(releaseDir))
 
-    exePath = getExePath(releaseDir)
+    exePath = getAbsolute(getExePath(releaseDir))
     if(not exePath):
         errorOccured("Cannot find exe path",True)
     print("Found exe at : {}\n".format(exePath))
 
     if(CONFIG_outputDir == "AUTO"):
-        CONFIG_outputDir = "./{}/{}".format(CONFIG_DEPLOY_OUTPUT_DIR,pathlib.Path(exePath).stem+"_release")
-        CONFIG_outputAssetDir = f"{CONFIG_outputDir}/Assets/"
+        CONFIG_outputDir = getAbsolute("./{}/{}".format(CONFIG_DEPLOY_OUTPUT_DIR,pathlib.Path(exePath).stem+"_release"))
+        CONFIG_outputAssetDir = getAbsolute(f"{CONFIG_outputDir}/Assets/")
 
 
     
@@ -145,7 +151,7 @@ def main():
 
     
 
-    simpleUpdaterExeFile= getExePath(releaseDir,".*SimpleUpdater\.exe")
+    simpleUpdaterExeFile= getAbsolute(getExePath(releaseDir,".*SimpleUpdater\.exe"))
     print("Copying SimpleUpdater exe...")
     try:
         shutil.copy(simpleUpdaterExeFile,CONFIG_outputDir)
@@ -156,9 +162,12 @@ def main():
     print("Running windeployqt...")
     if(not checkFile(CONFIG_WINDEPLOYQT_PATH)):
         errorOccured("Cannot find windeployqt exe at {}".format(CONFIG_WINDEPLOYQT_PATH),True)
-    windeployCmd = "{} {} {}".format(CONFIG_WINDEPLOYQT_PATH,CONFIG_outputDir,exePath)
+    windeployCmd = "{} --no-translations {} {}".format(CONFIG_WINDEPLOYQT_PATH,CONFIG_outputDir,exePath)
+    # qtEnv = {**os.environ, 'PATH': f'C:\\Qt\\{QT_VERSION}\\mingw_64\\bin;C:\\Qt\\Tools\\{MINGW_VERSION}\\bin;' + os.environ['PATH']}
+    qtEnv = {**os.environ, 'PATH': f'C:\\Qt\\{QT_VERSION}\\mingw_64\\bin;C:\\Qt\\Tools\\{MINGW_VERSION}\\bin;'}
     print("\tusing command <{}>".format(windeployCmd))
-    if(os.system(windeployCmd)):#if windeployqt failed
+    rval = subprocess.Popen(windeployCmd, env=qtEnv)
+    if rval.returncode != 0:
         errorOccured("WARNING: windeployqt may have failed to execute properly.",False)
     print("Done")
 
@@ -185,12 +194,18 @@ def main():
     print("Deleting useless files")
 
     for uselessFilePath in uselessFileList:
-        if(checkFile(uselessFilePath)):
-            print("\tDeleting : <{}>".format(uselessFilePath))
-            try:
-                os.remove(uselessFilePath)
-            except:
-                errorOccured("Cannot delete <{}>".format(uselessFilePath),False)#non fatal error, keep going
+        toRemove = pathlib.Path(uselessFilePath)
+        for i in range(0,10):
+            if not checkFile(str(toRemove.absolute())):
+                print(f"Waiting for {toRemove}")
+                time.sleep(0.3)
+            else:
+                break
+        print("\tDeleting : <{}>".format(toRemove.absolute()))
+        try:
+            toRemove.unlink()
+        except:
+            errorOccured("Cannot delete <{}>".format(toRemove),False)#non fatal error, keep going
     print("Done\n")
 
 
@@ -221,8 +236,6 @@ def main():
 
     print("##########################################")
     print("\nCreating setup...")
-
-    os.system(" {}".format(CONFIG_INNOSETUP_SCRIPT))
     
     innoSetup = f"C:\\Program Files (x86)\\Inno Setup 6\\iscc.exe"
     args = [
