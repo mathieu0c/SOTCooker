@@ -9,7 +9,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 add_library("${target_name}")
 add_library(${target_name}::${target_name} ALIAS "${target_name}")
 
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS TextToSpeech)
+find_package(Qt6 REQUIRED COMPONENTS TextToSpeech)
 
 set(ADDITIONAL_SOURCES
 
@@ -24,9 +24,9 @@ target_sources("${target_name}"
 )
 target_link_libraries("${target_name}"
     PRIVATE
-    Qt${QT_VERSION_MAJOR}::Core
+    Qt::Core
     PUBLIC
-    Qt${QT_VERSION_MAJOR}::TextToSpeech
+    Qt::TextToSpeech
 )
 
 target_include_directories(${target_name}

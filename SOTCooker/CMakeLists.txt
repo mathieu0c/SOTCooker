@@ -52,43 +52,13 @@ include(cmake/modules/Utils.cmake)
 #                             #
 ###############################
 
-
-if(NOT DEFINED BASE_PROTO_PATH)
-    set(BASE_PROTO_PATH "C:\\msys64\\mingw64")
-endif()
-
-
-# --- Protobuf ---
-#See README for more info about installation
-set(Protobuf_PREFIX_PATH
-    "${BASE_PROTO_PATH}\\include"            
-    "${BASE_PROTO_PATH}\\lib"             
-    "${BASE_PROTO_PATH}\\bin" )
-list(APPEND CMAKE_PREFIX_PATH "${Protobuf_PREFIX_PATH}")
-
-set(Protobuf_USE_STATIC_LIBS ON)
-find_package(Protobuf REQUIRED HINTS "${BASE_PROTO_PATH}\\lib\\cmake\\protobuf")
-
-message(STATUS "Protobuf include dir: ${Protobuf_INCLUDE_DIRS}")
-
-if(NOT DEFINED Protobuf_INCLUDE_DIRS)
-    set(Protobuf_INCLUDE_DIRS "${BASE_PROTO_PATH}\\include" CACHE BOOL "")
-endif()
-include_directories(SYSTEM ${Protobuf_INCLUDE_DIRS})
-
-find_package(Protobuf)
-include_directories(SYSTEM ${Protobuf_INCLUDE_DIRS})
-
 # --- Qt ---
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Network REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Network REQUIRED)
+find_package(Qt6 COMPONENTS Widgets Network REQUIRED)
 
 
 # --- Sudirectories ---
 
 add_subdirectory(Libs)
-
-
 
 
 ###############################
@@ -132,10 +102,8 @@ qt_add_executable(${EXE_NAME} WIN32
 )
 
 target_link_libraries(${EXE_NAME} PRIVATE
-    Qt${QT_VERSION_MAJOR}::Widgets
-    Qt${QT_VERSION_MAJOR}::Network
-    libSimpleUpdater::libSimpleUpdater
-    CookerProto::CookerProto
+    Qt::Widgets
+    Qt::Network
     SotTools::SotTools
     QtWindowsUtils::QtWindowsUtils
     TextToSpeech::TextToSpeech
