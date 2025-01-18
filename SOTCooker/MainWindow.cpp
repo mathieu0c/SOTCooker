@@ -95,7 +95,12 @@ void MainWindow::OnKeyboardPressed(int key) {
   // }
 
   static const std::array kKeyboardActions{
-      KeyboardAction{&sot::KeyboardProfile::start_cooking, [this]() { m_cooker.StartCooking(m_cooker.CookingType()); }},
+      KeyboardAction{&sot::KeyboardProfile::start_cooking,
+                     [this]() {
+                       m_cooker.StartCooking(m_cooker.CookingType() == sot::CookingType::kNone
+                                                 ? sot::CookingType::kFish
+                                                 : m_cooker.CookingType());
+                     }},
       KeyboardAction{&sot::KeyboardProfile::start_cooking_fish,
                      [this]() { m_cooker.StartCooking(sot::CookingType::kFish); }},
       KeyboardAction{&sot::KeyboardProfile::start_cooking_trophy_fish,

@@ -43,14 +43,11 @@ CookingType LoopCookingType(CookingType type, bool move_forward) {
 
   /* Exception for looping back to top when going backward with a bottom value */
   if (kNext <= Underlying(CookingType::kNone) && Underlying(type) >= Underlying(CookingType::kFish)) {
-    type = static_cast<CookingType>(Underlying(CookingType::kMaxValue) - 1);
+    return static_cast<CookingType>(Underlying(CookingType::kMaxValue) - 1);
+  } else if (kNext >= Underlying(CookingType::kMaxValue) || kNext <= Underlying(CookingType::kNone)) {
+    return static_cast<CookingType>(Underlying(CookingType::kNone) + 1);
   }
-
-  if (kNext >= Underlying(CookingType::kMaxValue) || kNext <= Underlying(CookingType::kNone)) {
-    type = static_cast<CookingType>(Underlying(CookingType::kNone) + 1);
-  }
-
-  return static_cast<CookingType>(type);
+  return static_cast<CookingType>(kNext);
 }
 
 QJsonObject ToJson(const KeyboardProfile& profile) {

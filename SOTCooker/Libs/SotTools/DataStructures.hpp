@@ -20,6 +20,9 @@ enum class CookingType : int32_t {
 constexpr auto Underlying(CookingType type) {
   return static_cast<int32_t>(type);
 }
+constexpr bool operator==(CookingType lhs, CookingType rhs) {
+  return Underlying(lhs) == Underlying(rhs);
+}
 
 struct CookingTypeSettings {
   bool valid{};
