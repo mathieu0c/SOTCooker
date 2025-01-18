@@ -129,8 +129,16 @@ def replace_in_template(input_template_path: str, output_path: str):
     tag_commit_list = get_tag_commit_list()
     version_list = find_versions(tag_commit_list)
     print(f"VersionList: {version_list}")
-    latest_ver_maj, latest_ver_min, latest_ver_patch = version_list[-1].version_to_numeric(
-    )
+    current_version = None
+    for v in version_list:
+        if v.tag == get_current_tag():
+            current_version = v
+            break
+
+    if not current_version:
+        current_version = version_list[-1]
+
+    latest_ver_maj, latest_ver_min, latest_ver_patch = current_version.version_to_numeric()
     current_tag = get_current_tag()
 
     known_macros = {r"{py_major}": latest_ver_maj,

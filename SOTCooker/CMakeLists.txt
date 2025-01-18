@@ -72,7 +72,6 @@ set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/Assets/iconResource.r
 set(PROJECT_SOURCES
         LoggerHandler.hpp
 
-        Constants.hpp
         PathUtils.hpp PathUtils.cpp
         
         main.cpp

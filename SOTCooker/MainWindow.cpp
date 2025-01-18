@@ -2,6 +2,7 @@
 
 #include <DataStructures.hpp>
 #include <DialogGetKeyCode.hpp>
+#include <PathUtils.hpp>
 #include <QDebug>
 #include <QFileInfo>
 #include <QMessageBox>
@@ -11,6 +12,10 @@
 #include <TextToSpeech.hpp>
 #include <WinEventHandler.hpp>
 #include <WinUtils.hpp>
+#include <git_version.hpp>
+
+#include <UpdateTools/network.hpp>
+#include <UpdateTools/requests.hpp>
 
 #include "./ui_MainWindow.h"
 #include "CircularProgressBar.hpp"
@@ -38,27 +43,16 @@ MainWindow::MainWindow(QWidget* parent)
 
   test();
 
-  const auto kPbOpt{sot::LoadKeyboardProfile(c_config_file)};
-  if (!kPbOpt && false) {
+  const auto kProfileOpt{sot::LoadKeyboardProfile(c_config_file)};
+  if (!kProfileOpt && false) {
     QString err{tr("Could not read config file: %0").arg(c_config_file)};
     qCritical() << err;
     QMessageBox::critical(this, tr("Error"), tr("Fatal error:\n%0").arg(err));
     throw std::runtime_error(err.toStdString());
   }
-  GetCurrentProfile() = kPbOpt.value();
+  GetCurrentProfile() = kProfileOpt.value();
 
   connect(win::WindowsEventThread::ins(), &win::WindowsEventThread::keyDown, this, &MainWindow::OnKeyboardPressed);
-
-  //    win::sendKeyboardEvent(90,true);
-  //    win::sendKeyboardEvent(90,false);
-  //    auto key{win::DialogGetKeyCode::GetSimpleKey(this)};
-  //    if(key == win::DialogGetKeyCode::KeyVal::kCancelled){
-  //        qDebug() << "Cancelled";
-  //    } else if(key == win::DialogGetKeyCode::KeyVal::kUnbind){
-  //        qDebug() << "Unbind";
-  //    } else{
-  //        qDebug() << "Register key:" << key << " :" << win::virtualKeyCodeToString(static_cast<uint32_t>(key));
-  //    }
 
   ConnectButtons();
   UpdateAllButtonsTexts();
@@ -67,6 +61,14 @@ MainWindow::MainWindow(QWidget* parent)
   connect(&m_cooker, &sot::Cooker::StartedCooking, this, &MainWindow::OnCookerStarted);
   connect(&m_cooker, &sot::Cooker::FinishedCooking, this, &MainWindow::OnCookerFinished);
   connect(&m_cooker, &sot::Cooker::CookingCancelled, this, &MainWindow::OnCookerCancelled);
+
+  QLabel* status_version{new QLabel(QString::fromStdString(gitversion::GetVersionRepresentationString()))};
+  auto version_font{status_version->font()};
+  version_font.setBold(false);
+  version_font.setPointSize(10);
+  status_version->setFont(version_font);
+  status_version->setStyleSheet("color: #000000;");
+  ui->statusbar->addPermanentWidget(status_version);
 }
 
 MainWindow::~MainWindow() {
@@ -79,21 +81,6 @@ struct KeyboardAction {
 };
 
 void MainWindow::OnKeyboardPressed(int key) {
-  // sot::ForEachKeyWithCookingType(GetCurrentProfile(), [&](int32_t action_key, sot::CookingType cooking_type) {
-  //   if (key != action_key) {
-  //     return;
-  //   }
-
-  //   qInfo() << "Start cooking!";
-  //   m_cooker.StartCooking(cooking_type);
-  // });
-
-  // if (key == GetCurrentProfile().key_get_remaining_time()) {
-  //   OnGetRemainingTimeRequested();
-  // } else if (key == GetCurrentProfile().key_cancel_cooking()) {
-  //   m_cooker.Cancel();
-  // }
-
   static const std::array kKeyboardActions{
       KeyboardAction{&sot::KeyboardProfile::start_cooking,
                      [this]() {
@@ -211,5 +198,5 @@ void MainWindow::UpdateAllButtonsTexts() {
 }
 
 void MainWindow::on_action_check_updates_triggered() {
-  // m_updateHandler->show();
+  sot::RetrieveUpdate(true);
 }

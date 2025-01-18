@@ -60,16 +60,7 @@ int main(int argc, char *argv[]) {
   cus::TextPlayer::SetRate(0.3);
 
   /* -- Updates -- */
-  updt::RetrieveLatestDistantVersion(
-      updt::GithubReleasesUrl("BrokenGameNoob", "BrokenTC22"),
-      [](std::optional<updt::DistantVersion> version) {
-        if (!version.has_value()) {
-          SPDLOG_ERROR("Cannot retrieve latest version from github");
-          return;
-        }
-        SPDLOG_INFO("Latest available version: {}", version->version);
-      },
-      true);
+  sot::RetrieveUpdate(false);
 
   /* -- Actual start -- */
 

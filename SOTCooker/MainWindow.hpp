@@ -1,7 +1,6 @@
 #ifndef MAINWINDOW_HPP
 #define MAINWINDOW_HPP
 
-#include <Constants.hpp>
 #include <QMainWindow>
 #include <QPushButton>
 #include <SOTCooker.hpp>
@@ -54,19 +53,9 @@ class MainWindow : public QMainWindow {
     return m_config;
   }
 
-  template <typename T>
-  using KeyboardProfileSetter = void (sot::KeyboardProfile::*)(T);
-  template <typename T>
-  using KeyboardProfileGetter = T (sot::KeyboardProfile::*)() const;
-  template <typename T>
-  struct KeyboardProfileMutators {
-    KeyboardProfileSetter<T> setter;
-    KeyboardProfileGetter<T> getter;
-  };
-
   using KeyboardProfileKeyPtr = sot::KeyboardProfile::Key sot::KeyboardProfile::*;
 
-  void ConnectButton(QPushButton *pb, KeyboardProfileKeyPtr key_ptr);
+  void ConnectButton(QPushButton* pb, KeyboardProfileKeyPtr key_ptr);
   void ConnectButtons();
 
   void UpdateAllButtonsTexts();

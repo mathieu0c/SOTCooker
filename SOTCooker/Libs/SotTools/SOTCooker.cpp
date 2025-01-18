@@ -25,9 +25,6 @@ void Cooker::StartCooking(sot::CookingType type) {
   }
 
   if (IsCooking()) {
-    const auto& kPreviousCookingSettings{sot::GetCookingSettings(kPreviousCookingType)};
-    qWarning() << "Was already cooking a" << kPreviousCookingSettings.name << " ("
-               << sot::Underlying(kPreviousCookingType) << ")";
     emit RestartedRunningCooking(kPreviousCookingType, m_cooking_type);
   }
 
@@ -35,7 +32,6 @@ void Cooker::StartCooking(sot::CookingType type) {
 
   m_cooking_timer.SetInterval(kMsInterval);
   m_cooking_timer.Start();
-  qInfo() << "Starting cooking for:" << kMsInterval << "ms (" << kCookingSettings.name << ")";
   emit StartedCooking(m_cooking_type);
   m_notifier.SetCooking(m_cooking_type);
 }
@@ -50,7 +46,6 @@ void Cooker::Cancel() {
 }
 
 void Cooker::OnCookingFinished() {
-  qInfo() << "Finished cooking " << sot::GetCookingSettings(m_cooking_type).name;
   emit FinishedCooking(m_cooking_type);
 }
 
