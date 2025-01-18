@@ -1,0 +1,19 @@
+#include <git_version.hpp>
+
+namespace gitversion {
+
+const GitInfo& GetInfo() {
+  static GitInfo info{.last_known_version = {.major = {py_major}, .minor = {py_minor}, .patch = {py_patch}},
+                      .is_release = {py_is_release},
+                      .is_modified = {py_is_modified},
+                      .current_commit = "{py_current_commit}",
+                      .current_tag = "{py_current_tag}"};
+  return info;
+}
+
+const std::string& GetVersionRepresentationString() {
+  static std::string repr{GetVersionRepresentationString(GetInfo())};
+  return repr;
+}
+
+}  // namespace gitversion

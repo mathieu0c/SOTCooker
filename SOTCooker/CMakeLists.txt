@@ -73,6 +73,7 @@ set(PROJECT_SOURCES
         LoggerHandler.hpp
 
         Constants.hpp
+        PathUtils.hpp PathUtils.cpp
         
         main.cpp
         MainWindow.cpp
@@ -104,6 +105,10 @@ qt_add_executable(${EXE_NAME} WIN32
 target_link_libraries(${EXE_NAME} PRIVATE
     Qt::Widgets
     Qt::Network
+    libGitVersion::libGitVersion
+    libLogger::libLogger
+    libUtils::libUtils
+    libUpdateTools::libUpdateTools
     SotTools::SotTools
     QtWindowsUtils::QtWindowsUtils
     TextToSpeech::TextToSpeech
@@ -123,6 +128,9 @@ set_property(GLOBAL PROPERTY COMPILE_WARNING_AS_ERROR OFF)
 # Code macros (definitions)   #
 #                             #
 ###############################
+
+add_compile_definitions(CMAKEMACRO_PROJECT_EXE="${CMAKE_PROJECT_NAME}")
+add_compile_definitions(CMAKEMACRO_BASE_PROJECT_DIR="${CMAKE_SOURCE_DIR}")
 
 add_definitions("-DPROJECT_V_MAJOR=${VERSIONING_MAJOR}")
 add_definitions("-DPROJECT_V_MINOR=${VERSIONING_MINOR}")

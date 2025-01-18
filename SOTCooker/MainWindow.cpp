@@ -1,5 +1,6 @@
 #include "MainWindow.hpp"
 
+#include <DataStructures.hpp>
 #include <DialogGetKeyCode.hpp>
 #include <QDebug>
 #include <QFileInfo>
@@ -25,10 +26,9 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent),
       ui(new Ui::MainWindow),
       c_appdata_folder{QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/"},
-      c_config_file{QString{"%0config.json"}.arg(c_appdata_folder)},
-      m_updateHandler{new updt::UpdateHandler(consts::CURRENT_VERSION, consts::PROJECT_GITHUB_RELEASE,
-                                              consts::PUBLIC_VERIFIER_KEY_FILE, true, consts::POST_UPDATE_CMD, true,
-                                              this)} {
+      c_config_file{QString{"%0config.json"}.arg(c_appdata_folder)}
+
+{
   ui->setupUi(this);
 
   if (!QFileInfo::exists(c_config_file)) {
@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget* parent)
 
   test();
 
-  const auto kPbOpt{pb::ReadFromFile<sot::KeyboardProfile>(c_config_file)};
+  const auto kPbOpt{sot::LoadKeyboardProfile(c_config_file)};
   if (!kPbOpt && false) {
     QString err{tr("Could not read config file: %0").arg(c_config_file)};
     qCritical() << err;
@@ -67,30 +67,57 @@ MainWindow::MainWindow(QWidget* parent)
   connect(&m_cooker, &sot::Cooker::StartedCooking, this, &MainWindow::OnCookerStarted);
   connect(&m_cooker, &sot::Cooker::FinishedCooking, this, &MainWindow::OnCookerFinished);
   connect(&m_cooker, &sot::Cooker::CookingCancelled, this, &MainWindow::OnCookerCancelled);
-
-  std::function<void(void)> nothing{[]() {}};
-  const auto kWasUpdated{updt::acquireUpdated(nothing, consts::UPDATED_TAG_FILENAME)};
-  qInfo() << "Was updated?" << kWasUpdated;
 }
 
 MainWindow::~MainWindow() {
   delete ui;
 }
 
+struct KeyboardAction {
+  sot::KeyboardProfile::Key sot::KeyboardProfile::*key_ptr{nullptr};
+  std::function<void()> callback;
+};
+
 void MainWindow::OnKeyboardPressed(int key) {
-  sot::ForEachKeyWithCookingType(GetCurrentProfile(), [&](int32_t action_key, sot::CookingType cooking_type) {
-    if (key != action_key) {
-      return;
+  // sot::ForEachKeyWithCookingType(GetCurrentProfile(), [&](int32_t action_key, sot::CookingType cooking_type) {
+  //   if (key != action_key) {
+  //     return;
+  //   }
+
+  //   qInfo() << "Start cooking!";
+  //   m_cooker.StartCooking(cooking_type);
+  // });
+
+  // if (key == GetCurrentProfile().key_get_remaining_time()) {
+  //   OnGetRemainingTimeRequested();
+  // } else if (key == GetCurrentProfile().key_cancel_cooking()) {
+  //   m_cooker.Cancel();
+  // }
+
+  static const std::array kKeyboardActions{
+      KeyboardAction{&sot::KeyboardProfile::start_cooking, [this]() { m_cooker.StartCooking(m_cooker.CookingType()); }},
+      KeyboardAction{&sot::KeyboardProfile::start_cooking_fish,
+                     [this]() { m_cooker.StartCooking(sot::CookingType::kFish); }},
+      KeyboardAction{&sot::KeyboardProfile::start_cooking_trophy_fish,
+                     [this]() { m_cooker.StartCooking(sot::CookingType::kTrophyFish); }},
+      KeyboardAction{&sot::KeyboardProfile::start_cooking_meat,
+                     [this]() { m_cooker.StartCooking(sot::CookingType::kMeat); }},
+      KeyboardAction{&sot::KeyboardProfile::start_cooking_kraken,
+                     [this]() { m_cooker.StartCooking(sot::CookingType::kKraken); }},
+      KeyboardAction{&sot::KeyboardProfile::start_cooking_megalodon,
+                     [this]() { m_cooker.StartCooking(sot::CookingType::kMegalodon); }},
+      KeyboardAction{&sot::KeyboardProfile::start_cooking_cycle,
+                     [this]() { m_cooker.StartCooking(sot::LoopCookingType(m_cooker.CookingType(), true)); }},
+      KeyboardAction{&sot::KeyboardProfile::start_cooking_cache,
+                     [this]() { m_cooker.StartCooking(sot::CookingType::kCache); }},
+      KeyboardAction{&sot::KeyboardProfile::get_remaining_time, [this]() { OnGetRemainingTimeRequested(); }},
+      KeyboardAction{&sot::KeyboardProfile::cancel_cooking, [this]() { m_cooker.Cancel(); }},
+  };
+
+  for (const auto& action : kKeyboardActions) {
+    if (key == GetCurrentProfile().*action.key_ptr) {
+      action.callback();
     }
-
-    qInfo() << "Start cooking!";
-    m_cooker.StartCooking(cooking_type);
-  });
-
-  if (key == GetCurrentProfile().key_get_remaining_time()) {
-    OnGetRemainingTimeRequested();
-  } else if (key == GetCurrentProfile().key_cancel_cooking()) {
-    m_cooker.Cancel();
   }
 }
 
@@ -141,66 +168,43 @@ void MainWindow::OnGetRemainingTimeRequested() {
   cus::TextPlayer::Play(sot::GetAudioTimeStr(kRemaining));
 }
 
-void MainWindow::ConnectButton(QPushButton* pb, KeyboardProfileMutators<int> mutators) {
-  connect(pb, &QPushButton::clicked, this, [this, pb, mutators] {
+void MainWindow::ConnectButton(QPushButton* pb, KeyboardProfileKeyPtr key_ptr) {
+  connect(pb, &QPushButton::clicked, this, [this, pb, key_ptr] {
     auto key{win::DialogGetKeyCode::GetSimpleKey(this)};
     if (key == win::DialogGetKeyCode::KeyVal::kCancelled) {
       return;
     }  // else
-    // note: an unbinded key value is win::DialogGetKeyCode::KeyVal::kUnbind = -1
-    const auto& setter{mutators.setter};
-    const auto& getter{mutators.getter};
+
     if (key == win::DialogGetKeyCode::KeyVal::kUnbind) {
-      std::invoke(setter, GetCurrentProfile(), sot::kUnbindKey);
+      GetCurrentProfile().*key_ptr = sot::KeyboardProfile::kUnbindKey;
     } else {
-      std::invoke(setter, GetCurrentProfile(), key);
+      GetCurrentProfile().*key_ptr = key;
     }
     SaveKeyboardProfile();
-    UpdateButtonText(pb, std::invoke(getter, GetCurrentProfile()));
+    UpdateButtonText(pb, GetCurrentProfile().*key_ptr);
   });
-  m_pb_links[pb] = mutators;
+  m_pb_links[pb] = key_ptr;
 }
 
 void MainWindow::ConnectButtons() {
-  ConnectButton(ui->pb_key_start_cooking,
-                {&sot::KeyboardProfile::set_key_start_cooking, &sot::KeyboardProfile::key_start_cooking});
-
-  ConnectButton(ui->pb_key_start_cook_fish,
-                {&sot::KeyboardProfile::set_key_start_cooking_fish, &sot::KeyboardProfile::key_start_cooking_fish});
-
-  ConnectButton(
-      ui->pb_key_start_cook_trophyfish,
-      {&sot::KeyboardProfile::set_key_start_cooking_trophy_fish, &sot::KeyboardProfile::key_start_cooking_trophy_fish});
-
-  ConnectButton(ui->pb_key_start_cook_meat,
-                {&sot::KeyboardProfile::set_key_start_cooking_meat, &sot::KeyboardProfile::key_start_cooking_meat});
-
-  ConnectButton(ui->pb_key_start_cook_kraken,
-                {&sot::KeyboardProfile::set_key_start_cooking_kraken, &sot::KeyboardProfile::key_start_cooking_kraken});
-
-  ConnectButton(
-      ui->pb_key_start_cook_megalodon,
-      {&sot::KeyboardProfile::set_key_start_cooking_megalodon, &sot::KeyboardProfile::key_start_cooking_megalodon});
-
-  ConnectButton(ui->pb_key_start_cook_cycle,
-                {&sot::KeyboardProfile::set_key_start_cooking_cycle, &sot::KeyboardProfile::key_start_cooking_cycle});
-
-  ConnectButton(ui->pb_key_start_cook_cache,
-                {&sot::KeyboardProfile::set_key_start_cooking_cache, &sot::KeyboardProfile::key_start_cooking_cache});
-
-  ConnectButton(ui->pb_key_get_remaining_time,
-                {&sot::KeyboardProfile::set_key_get_remaining_time, &sot::KeyboardProfile::key_get_remaining_time});
-
-  ConnectButton(ui->pb_key_cancel,
-                {&sot::KeyboardProfile::set_key_cancel_cooking, &sot::KeyboardProfile::key_cancel_cooking});
+  ConnectButton(ui->pb_key_start_cooking, &sot::KeyboardProfile::start_cooking);
+  ConnectButton(ui->pb_key_start_cook_fish, &sot::KeyboardProfile::start_cooking_fish);
+  ConnectButton(ui->pb_key_start_cook_trophyfish, &sot::KeyboardProfile::start_cooking_trophy_fish);
+  ConnectButton(ui->pb_key_start_cook_meat, &sot::KeyboardProfile::start_cooking_meat);
+  ConnectButton(ui->pb_key_start_cook_kraken, &sot::KeyboardProfile::start_cooking_kraken);
+  ConnectButton(ui->pb_key_start_cook_megalodon, &sot::KeyboardProfile::start_cooking_megalodon);
+  ConnectButton(ui->pb_key_start_cook_cycle, &sot::KeyboardProfile::start_cooking_cycle);
+  ConnectButton(ui->pb_key_start_cook_cache, &sot::KeyboardProfile::start_cooking_cache);
+  ConnectButton(ui->pb_key_get_remaining_time, &sot::KeyboardProfile::get_remaining_time);
+  ConnectButton(ui->pb_key_cancel, &sot::KeyboardProfile::cancel_cooking);
 }
 
 void MainWindow::UpdateAllButtonsTexts() {
-  for (auto& [pb, mutators] : m_pb_links) {
-    UpdateButtonText(pb, std::invoke(mutators.getter, GetCurrentProfile()));
+  for (auto& [pb, key_ptr] : m_pb_links) {
+    UpdateButtonText(pb, GetCurrentProfile().*key_ptr);
   }
 }
 
 void MainWindow::on_action_check_updates_triggered() {
-  m_updateHandler->show();
+  // m_updateHandler->show();
 }

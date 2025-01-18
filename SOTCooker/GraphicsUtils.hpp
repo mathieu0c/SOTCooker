@@ -1,14 +1,13 @@
 #pragma once
 
-#include <WinUtils.hpp>
+#include <DataStructures.hpp>
 #include <QPushButton>
-#include <CookerProto.hpp>
+#include <WinUtils.hpp>
 
-inline
-void UpdateButtonText(QPushButton* pb,int32_t key){
-    if(key == sot::kUnbindKey){
-        pb->setText("");
-        return;
-    }
-    pb->setText(win::GetVkStr(key));
+inline void UpdateButtonText(QPushButton* pb, int32_t key) {
+  if (key == sot::KeyboardProfile::kUnbindKey) {
+    pb->setText("");
+    return;
+  }
+  pb->setText(win::GetVkStr(key));
 }

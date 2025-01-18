@@ -22,8 +22,8 @@ target_sources("${target_name}"
 )
 target_link_libraries("${target_name}"
     PRIVATE
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt6::Core
+    Qt6::Widgets
 )
 
 target_include_directories(${target_name}
